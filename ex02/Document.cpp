@@ -27,25 +27,30 @@ void Document :: print_all() const
 
 void Document :: change_current(int new_current)
 {
-    if(new_current <= (int)_lines.size())
-        this-> _current_line = new_current - 1;
+    int fix_current = new_current-1;
+    if(fix_current <= (int)_lines.size())
+        this-> _current_line = fix_current;
     else
         throw std::runtime_error("error, new current line is out of scope!");
+    
 }
 
 void Document :: append_after(const string& append)
 {
-    if(_current_line > 0 and _current_line < (int)_lines.size())
-        this->change_line(append);
+    if(_current_line >= 0 && _current_line < (int)_lines.size()-1)
+    {
+        vector<string>::iterator it = this->_lines.begin() + this->_current_line+1;
+        this->_lines.insert(it, append);
+    }
     else
         this-> _lines.push_back(append);
-        this-> _current_line++;
+    this-> _current_line++;
+        
 }
 
 void Document :: insert_before(const string& insert)
 {
-    vector<string>::iterator it;
-    it = this->_lines.begin() + this->_current_line;
+    vector<string>::iterator it = this->_lines.begin() + this->_current_line;
     this->_lines.insert(it, insert);
     this->_current_line++;
 }
@@ -70,7 +75,7 @@ int Document :: search(const string& index)
     for (int i = 0; i < (int)this-> _lines.size(); i++) {
         if((pos = this->_lines.at(i).find(index)) != std::string::npos)
         {
-            std::cout << this->_lines.at(i) << std::endl;
+            // std::cout << this->_lines.at(i) << std::endl;
             return i;
         }
     }
@@ -82,7 +87,7 @@ void Document :: replace(string& old, string& new_word)
     int f_idx = this->search(old);
     if(f_idx < 0)
     {
-        throw std::runtime_error("error, string not found: " + old);
+        std::cout << old + " not found." << std::endl;
         return;   
     }
     

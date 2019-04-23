@@ -112,6 +112,7 @@ void Editor :: search(const string& keyword)
 {
   int idx = this-> doc.search(keyword);
   doc.set_current_line(idx);
+  doc.print_current();
 }
 
 void Editor :: replace(string& str)

@@ -74,10 +74,7 @@ int Document :: search(const string& index)
     size_t pos = 0;
     for (int i = 0; i < (int)this-> _lines.size(); i++) {
         if((pos = this->_lines.at(i).find(index)) != std::string::npos)
-        {
-            // std::cout << this->_lines.at(i) << std::endl;
             return i;
-        }
     }
     return -1;
 }

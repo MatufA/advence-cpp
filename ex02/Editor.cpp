@@ -12,7 +12,7 @@ bool is_pos_integer(const string& s)
     return(strspn(s.c_str(), "0123456789") == s.size());
 }
 
-void Editor:: start()
+void Editor:: loop()
 {
   while(true)
   {
@@ -65,6 +65,7 @@ void Editor:: start()
     else if(is_pos_integer(command))
     {
       this-> doc.change_current(atoi(command.c_str()));
+      this->doc.print_current();
     }
     else
       // throw exception if there is no legal command.

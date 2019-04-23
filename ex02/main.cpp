@@ -2,6 +2,6 @@
 
 int main() {
 	Editor editor;
-	editor.start();
+	editor.loop();
 	return 0;
 }

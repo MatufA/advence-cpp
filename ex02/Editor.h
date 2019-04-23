@@ -33,19 +33,6 @@ using std::string;
 class Editor {
 private:
 	Document doc;
-	
-	//command by regex
-	// regex _print_current{R"(^p$)"};
- //   regex _print_info{R"(^n$)"};
- //   regex _print_all{R"(^%p$)"};
- //   regex _change_current{R"(^\d+$)"};
- //   regex _append{R"(^a$)"};
- //   regex _insert{R"(^i$)"};
- //   regex _change_line{R"(^c$)"};
- //   regex _delete_current{R"(^d$)"};
- //   regex _search{R"(^\/\w+)"};
- //   regex _replace{R"(^s\/\w+\/\w+\/)"};
- //   regex _quit{R"(^Q$)"};
     string _delimeter_eof;
     
     Editor(const Editor& ed);
@@ -56,7 +43,7 @@ public:
 	~Editor();
 	
 	//waiting for user's input and using Document's methods
-	void start();
+	void loop();
 	void append();
 	void insert();
 	void modify();

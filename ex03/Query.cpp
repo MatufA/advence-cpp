@@ -14,14 +14,15 @@
 #include <regex>
 using std::regex;
 using namespace std;
+
 ////////////////////////////////////////////////////////////////////////////////
 std::shared_ptr<QueryBase> QueryBase::factory(const string& s)
 {
-  regex reg_one_word("^\\w+$");  // match one word only.
-  regex reg_not("^NOT (\\w+)$");  // match if contains NOT and one word in the end.
-  regex reg_and("^(\\w+) AND (\\w+)$");  // match if contains AND and one word befor and after.
-  regex reg_or("^(\\w+) OR (\\w+)$");  // match if contains or and one word befor and after.
-  regex reg_n("^(\\w+) (\\d+) (\\w+)$");  // match if contains n and one word befor and after.
+  regex reg_one_word("^'?\\s*['\\w]+\\s*$");  // match one word only.
+  regex reg_not("^\\s*NOT\\s+(['\\w]+)\\s*$");  // match if contains NOT and one word in the end.
+  regex reg_and("^\\s*(['\\w]+)\\s+AND\\s+(['\\w]+)\\s*$");  // match if contains AND and one word befor and after.
+  regex reg_or("^\\s*(['\\w]+)\\s+OR\\s+(['\\w]+)\\s*$");  // match if contains or and one word befor and after.
+  regex reg_n("^\\s*(['\\w]+)\\s+(\\d+)\\s+(['\\w]+)\\s*$");  // match if contains n and one word befor and after.
   
   smatch result;  
   
@@ -36,10 +37,11 @@ std::shared_ptr<QueryBase> QueryBase::factory(const string& s)
   else if(regex_search(s, result, reg_n))
     return std::shared_ptr<QueryBase>(new NQuery(result[1].str(), result[3].str(), stoi(result[2].str())));
   else
-    cout << "Unrecognized search" << endl;
+    throw invalid_argument("Unrecognized search");
   
 }
 ////////////////////////////////////////////////////////////////////////////////
+
 QueryResult NotQuery::eval(const TextQuery &text) const
 {
   QueryResult result = text.query(query_word);
@@ -83,9 +85,31 @@ QueryResult OrQuery::eval(const TextQuery &text) const
 
   return QueryResult(rep(), ret_lines, left_result.get_file());
 }
+
 /////////////////////////////////////////////////////////
 QueryResult NQuery::eval(const TextQuery &text) const
 {
-
+  std::string query = "[\\.\",]?(" + left_query + "|" + right_query + ")[\\.\",]?";
+  regex reg(query);  
+  smatch res;
+      
+  QueryResult result = AndQuery::eval(text);
+  auto ret_lines = std::make_shared<std::set<line_no>>();
+  std::set<unsigned long>::iterator it;
+      
+  for (it = result.begin(); it != result.end(); ++it) {
+    auto match = *(result.get_file()->begin() + *it);
+    istringstream line(match);     // separate the line into words
+    int count = 0;
+    int flag = 0;
+		std::string word;               
+		while (line >> word) {        // for each word in that line
+      flag += regex_search(word, res, reg);
+		  if(flag && flag < 2) count++; 
+		}
+		if(count-1 <= dist) ret_lines->insert(*it);
+  }
+  
+  return QueryResult(rep(), ret_lines, result.get_file());
 }
 /////////////////////////////////////////////////////////

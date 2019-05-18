@@ -16,8 +16,7 @@ using namespace std;
 TextQuery::TextQuery(ifstream &is): file(new vector<string>)
 {
     string text;
-	//regex words_regex("[\\w']+");
-	regex reg("[\\.\",]?([\\w]+)[\\.\",]?");  // Find Punctuation.
+	regex reg("[\\.\",]?(['\\w]+)[\\.\",]?");  // Find Punctuation.
 	smatch result;                    // regex search result.
     while (getline(is, text)) {       // for each line in the file
 		file->push_back(text);        // remember this line of text

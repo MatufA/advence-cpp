@@ -16,13 +16,15 @@ TextQuery::TextQuery(ifstream &is): file(new vector<string>)
 {
     string text;
 	regex words_regex("[\\w']+");
+	regex reg("[\.|\"|,]");  // Find Punctuation.
     while (getline(is, text)) {       // for each line in the file
+        text = regex_replace(target, reg, "");  // Replace with one word.
 		file->push_back(text);        // remember this line of text
 		int n = file->size() - 1;     // the current line number
 //////////////////////////////////////////////////////////////////////////
-		// istringstream line(text);     // separate the line into words
-		// string word;               
-		// while (line >> word) {        // for each word in that line
+		istringstream line(text);     // separate the line into words
+		string word;               
+		while (line >> word) {        // for each word in that line
 //////////////////////////////////////////////////////////////////////////	
             // if word isn't already in wm, subscripting adds a new entry
             auto &lines = wm[word]; // lines is a shared_ptr 

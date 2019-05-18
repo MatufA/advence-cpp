@@ -4,6 +4,7 @@
 #include "Query.h"
 #include "TextQuery.h"
 #include <memory>
+#include <cstdlib>
 #include <set>
 #include <algorithm>
 #include <iostream>
@@ -11,28 +12,29 @@
 #include <iterator>
 #include <stdexcept>
 #include <regex>
+using std::regex;
 using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 std::shared_ptr<QueryBase> QueryBase::factory(const string& s)
 {
-  regex reg_one_word("^[\w]+$");  // match one word only.
-  regex reg_not("\^NOT ([\w]+)$");  // match if contains NOT and one word in the end.
-  regex reg_and("^([\w]+) AND ([\w]+)$");  // match if contains AND and one word befor and after.
-  regex reg_or("^([\w]+) OR ([\w]+)$");  // match if contains or and one word befor and after.
-  regex reg_n("^([\w]+) n ([\w]+)$");  // match if contains n and one word befor and after.
+  regex reg_one_word("^\\w+$");  // match one word only.
+  regex reg_not("^NOT (\\w+)$");  // match if contains NOT and one word in the end.
+  regex reg_and("^(\\w+) AND (\\w+)$");  // match if contains AND and one word befor and after.
+  regex reg_or("^(\\w+) OR (\\w+)$");  // match if contains or and one word befor and after.
+  regex reg_n("^(\\w+) (\\d+) (\\w+)$");  // match if contains n and one word befor and after.
   
   smatch result;  
   
   if(regex_match(s, reg_one_word)) 
     return std::shared_ptr<QueryBase>(new WordQuery(s));
   else if(regex_search(s, result, reg_not))
-    return std::shared_ptr<QueryBase>(new NotQuery(result[1]));
+    return std::shared_ptr<QueryBase>(new NotQuery(result[1].str()));
   else if(regex_search(s, result, reg_and))
-    return std::shared_ptr<QueryBase>(new AndQuery(result[1], result[2]));
+    return std::shared_ptr<QueryBase>(new AndQuery(result[1].str(), result[2].str()));
   else if(regex_search(s, result, reg_or))
-    return std::shared_ptr<QueryBase>(new OrQuery(result[1], result[2]));
+    return std::shared_ptr<QueryBase>(new OrQuery(result[1].str(), result[2].str()));
   else if(regex_search(s, result, reg_n))
-    return std::shared_ptr<QueryBase>(new NQuery(result[1], result[2]));
+    return std::shared_ptr<QueryBase>(new NQuery(result[1].str(), result[3].str(), stoi(result[2].str())));
   else
     cout << "Unrecognized search" << endl;
   

@@ -9,22 +9,25 @@
 #include <iostream>
 #include <regex>
 #include <iterator>
+using std::regex;
 using namespace std;
 
 // read the input file and build the map of lines to line numbers
 TextQuery::TextQuery(ifstream &is): file(new vector<string>)
 {
     string text;
-	regex words_regex("[\\w']+");
-	regex reg("[\.|\"|,]");  // Find Punctuation.
+	//regex words_regex("[\\w']+");
+	regex reg("[\\.\",]?([\\w]+)[\\.\",]?");  // Find Punctuation.
+	smatch result;                    // regex search result.
     while (getline(is, text)) {       // for each line in the file
-        text = regex_replace(target, reg, "");  // Replace with one word.
 		file->push_back(text);        // remember this line of text
 		int n = file->size() - 1;     // the current line number
 //////////////////////////////////////////////////////////////////////////
 		istringstream line(text);     // separate the line into words
 		string word;               
 		while (line >> word) {        // for each word in that line
+		    regex_search(word, result, reg);  // Replace with one word.
+		    word = result[1].str();
 //////////////////////////////////////////////////////////////////////////	
             // if word isn't already in wm, subscripting adds a new entry
             auto &lines = wm[word]; // lines is a shared_ptr 
